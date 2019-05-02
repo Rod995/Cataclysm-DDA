@@ -1462,6 +1462,7 @@ void Item_factory::load( islot_armor &slot, JsonObject &jo, const std::string &s
     assign( jo, "environmental_protection", slot.env_resist, strict, 0 );
     assign( jo, "environmental_protection_with_filter", slot.env_resist_w_filter, strict, 0 );
     assign( jo, "warmth", slot.warmth, strict, 0 );
+    assign( jo, "strength", slot.strength, strict, 0 );
     assign( jo, "storage", slot.storage, strict, 0_ml );
     assign( jo, "power_armor", slot.power_armor, strict );
 

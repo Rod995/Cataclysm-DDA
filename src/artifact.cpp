@@ -238,6 +238,7 @@ struct artifact_armor_form_datum {
     int thickness;
     int env_resist;
     int warmth;
+    int strength;
     units::volume storage;
     int melee_bash;
     int melee_cut;
@@ -872,6 +873,8 @@ std::string new_artifact()
                 }
                 def.armor->warmth += modinfo.warmth;
 
+                def.armor->strength == modinfo.strength;
+
                 if( modinfo.storage > 0_ml || def.armor->storage > -modinfo.storage ) {
                     def.armor->storage += modinfo.storage;
                 } else {
@@ -1269,6 +1272,7 @@ void it_artifact_armor::deserialize( JsonObject &jo )
     armor->thickness = jo.get_int( "material_thickness" );
     armor->env_resist = jo.get_int( "env_resist" );
     armor->warmth = jo.get_int( "warmth" );
+    armor->strength = jo.get_int( "strength" );
     armor->storage = jo.get_int( "storage" ) * units::legacy_volume_factor;
     armor->power_armor = jo.get_bool( "power_armor" );
 
@@ -1404,6 +1408,7 @@ void it_artifact_armor::serialize( JsonOut &json ) const
     json.member( "material_thickness", armor->thickness );
     json.member( "env_resist", armor->env_resist );
     json.member( "warmth", armor->warmth );
+    json.member( "strength", armor->strength );
     json.member( "storage", armor->storage / units::legacy_volume_factor );
     json.member( "power_armor", armor->power_armor );
 

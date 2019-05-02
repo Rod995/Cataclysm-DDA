@@ -271,6 +271,10 @@ struct islot_armor {
      */
     int warmth = 0;
     /**
+     * Determines how much STR is added by the item. Does nothing if left blank.
+     */
+    int strength = 0;
+    /**
      * How much storage this items provides when worn.
      */
     units::volume storage = 0_ml;
