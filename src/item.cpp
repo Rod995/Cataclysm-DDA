@@ -4120,6 +4120,18 @@ int item::get_warmth() const
     return result + fur_lined + wool_lined;
 }
 
+/**
+int item::get_strength() const
+{
+    int strength_boost = 0;
+    if( item_tags.count( "boosted" ) > 0 ) {
+        somethingsomethingsomethingsomething
+    }
+
+    return result + strength_boost
+}
+**/
+
 units::volume item::get_pet_armor_max_vol() const
 {
     return is_pet_armor() ? type->pet_armor->max_vol : 0_ml;
