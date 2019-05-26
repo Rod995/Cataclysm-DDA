@@ -5583,6 +5583,10 @@ void game::peek( const tripoint &p )
         plthrow( INT_MIN, p );
     }
 
+    if( result.peek_action && *result.peek_action == PA_BLIND_FIRE ) {
+        plfire( INT_MIN, p );
+    }
+
     draw_ter();
     wrefresh( w_terrain );
     draw_panels();
@@ -6504,6 +6508,7 @@ look_around_result game::look_around( catacurses::window w_info, tripoint &cente
     ctxt.register_action( "SELECT" );
     if( peeking ) {
         ctxt.register_action( "throw_blind" );
+        ctxt.register_action( "fire_blind" );
     }
     if( !select_zone ) {
         ctxt.register_action( "TRAVEL_TO" );
@@ -6701,6 +6706,8 @@ look_around_result game::look_around( catacurses::window w_info, tripoint &cente
             }
         } else if( action == "throw_blind" ) {
             result.peek_action = PA_BLIND_THROW;
+        } else if( action == "fire_blind" ) {
+            result.peek_action = PA_BLIND_FIRE;
         } else if( action == "zoom_in" ) {
             center.x = lp.x;
             center.y = lp.y;
@@ -6711,7 +6718,7 @@ look_around_result game::look_around( catacurses::window w_info, tripoint &cente
             zoom_out();
         }
     } while( action != "QUIT" && action != "CONFIRM" && action != "SELECT" && action != "TRAVEL_TO" &&
-             action != "throw_blind" );
+             action != "throw_blind" action != "fire_blind" );
 
     if( m.has_zlevels() && center.z != old_levz ) {
         m.invalidate_map_cache( old_levz );

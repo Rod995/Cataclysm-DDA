@@ -1612,6 +1612,13 @@
   },
   {
     "type": "keybinding",
+    "name": "Blind Fire Weapon",
+    "category": "LOOK",
+    "id": "fire_blind",
+    "bindings": [ { "input_method": "keyboard", "key": "f" } ]
+  },
+  {
+    "type": "keybinding",
     "name": "Fire Wielded Item",
     "category": "DEFAULTMODE",
     "id": "fire",

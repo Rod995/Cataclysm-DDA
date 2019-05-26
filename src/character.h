@@ -591,6 +591,9 @@ class Character : public Creature, public visitable<Character>
         /** Dispersion of a thrown item, against a given target, taking into account whether or not the throw was blind. */
         int throwing_dispersion( const item &to_throw, Creature *critter = nullptr,
                                  bool is_blind_throw = false ) const;
+        /** Dispersion of a fired weapon, against a given target, taking into account whether or not the shot was blind. */
+        int firing_dispersion( const item &to_fire, Creature *critter = nullptr,
+                                 bool is_blind_fire = false ) const;
         /** How much dispersion does one point of target's dodge add when throwing at said target? */
         int throw_dispersion_per_dodge( bool add_encumbrance = true ) const;
 
