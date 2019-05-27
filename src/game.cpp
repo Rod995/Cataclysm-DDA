@@ -5584,7 +5584,7 @@ void game::peek( const tripoint &p )
     }
 
     if( result.peek_action && *result.peek_action == PA_BLIND_FIRE ) {
-        plfire( INT_MIN, p );
+        plblindfire( INT_MIN, p );
     }
 
     draw_ter();
@@ -7903,10 +7903,6 @@ bool game::plfire_check( const targeting_data &args )
     // If we previously shifted our position, put ourselves back now that we've picked our target.
     if( blind_fire_from_pos ) {
         u.setpos( original_player_position );
-    }
-
-    if( trajectory.empty() ) {
-        return;
     }
 
     if( thrown.count_by_charges() && thrown.charges > 1 ) {
