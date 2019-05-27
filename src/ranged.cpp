@@ -2219,7 +2219,7 @@ static double dispersion_from_skill( double skill, double weapon_dispersion )
 }
 
 // utility functions for projectile_attack
-dispersion_sources player::get_weapon_dispersion( const item &obj ) const
+dispersion_sources player::get_weapon_dispersion( const item &obj, Creature *critter, bool is_blind_fire ) const
 {
     int weapon_dispersion = obj.gun_dispersion();
     dispersion_sources dispersion( weapon_dispersion );
@@ -2253,6 +2253,9 @@ dispersion_sources player::get_weapon_dispersion( const item &obj ) const
         // Range is effectively four times longer when shooting flagged guns out of water.
         dispersion.add_range( 150 ); //Adding dispersion for additonal debuff
         dispersion.add_multiplier( 4 );
+    }
+    if( is_blind_fire ) {
+        dispersion *= 4;
     }
 
     return dispersion;

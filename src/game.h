@@ -115,7 +115,9 @@ using item_filter = std::function<bool ( const item & )>;
 
 enum peek_act : int {
     PA_BLIND_THROW
-    // obvious future additional value is PA_BLIND_FIRE
+    PA_BLIND_FIRE
+    // THE FUTURE IS NOW, OLD MAN
+    // PA_BLIND_FIRE IS HERE
 };
 
 struct look_around_result {
@@ -433,6 +435,8 @@ class game
          * @return Whether an attack was actually performed.
          */
         bool plfire( item &weapon, int bp_cost = 0 );
+        /** It handles firing. */
+        bool plfire( item &weapon, int pos = INT_MIN, const cata::optional<tripoint> &blind_fire_from_pos = cata::nullopt );
         /** Redirects to player::cancel_activity(). */
         void cancel_activity();
         /** Asks if the player wants to cancel their activity, and if so cancels it. */

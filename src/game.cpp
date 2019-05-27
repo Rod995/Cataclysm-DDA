@@ -6718,7 +6718,7 @@ look_around_result game::look_around( catacurses::window w_info, tripoint &cente
             zoom_out();
         }
     } while( action != "QUIT" && action != "CONFIRM" && action != "SELECT" && action != "TRAVEL_TO" &&
-             action != "throw_blind" action != "fire_blind" );
+             action != "throw_blind" && action != "fire_blind" );
 
     if( m.has_zlevels() && center.z != old_levz ) {
         m.invalidate_map_cache( old_levz );
@@ -7882,6 +7882,36 @@ bool game::plfire_check( const targeting_data &args )
                 return false;
             }
         }
+    }
+
+    // Shift our position to our "peeking" position, so that the UI
+    // for picking a fire point lets us target the location we couldn't
+    // otherwise see.
+    const tripoint original_player_position = u.pos();
+    if( blind_fire_from_pos ) {
+        u.setpos( *blind_fire_from_pos );
+        draw_ter();
+    }
+    temp_exit_fullscreen();
+    m.draw( w_terrain, u.pos() );
+
+    const target_mode target_mode = blind_fire_from_pos ? TARGET_MODE_FIRE_BLIND : TARGET_MODE_FIRE
+
+    // target_ui() sets x and y, or returns empty vector if we canceled (by pressing Esc)
+    std::vector<tripoint> trajectory = target_handler().target_ui( u, target_mode, &thrown, range );
+
+    // If we previously shifted our position, put ourselves back now that we've picked our target.
+    if( blind_fire_from_pos ) {
+        u.setpos( original_player_position );
+    }
+
+    if( trajectory.empty() ) {
+        return;
+    }
+
+    if( thrown.count_by_charges() && thrown.charges > 1 ) {
+        u.i_at( -1 ).charges--;
+        thrown.charges = 1;
     }
 
     return true;

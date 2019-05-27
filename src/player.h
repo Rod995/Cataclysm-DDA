@@ -599,7 +599,7 @@ class player : public Character
          *  @param gun item to fire (which does not necessary have to be in the players possession)
          *  @return number of shots actually fired
          */
-        int fire_gun( const tripoint &target, int shots, item &gun );
+        int fire_gun( const tripoint &target, int shots, item &gun, const cata::optional<tripoint> &blind_fire_from_pos = cata::nullopt );
 
         /** Handles reach melee attacks */
         void reach_attack( const tripoint &target );
