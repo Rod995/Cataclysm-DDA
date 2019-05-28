@@ -673,6 +673,10 @@ static int draw_targeting_window( const catacurses::window &w_target, const std:
             title = string_format( _( "Blind throwing %s" ), name );
             break;
 
+        case TARGET_MODE_FIRE_BLIND:
+            title = string_format( _( "Blind firing %s" ), name );
+            break;
+
         default:
             title = _( "Set target" );
     }
@@ -862,6 +866,12 @@ static int print_ranged_chance( const player &p, const catacurses::window &w, in
         aim_types = p.get_aim_types( ranged_weapon );
     }
 
+    if( mode == TARGET_MODE_FIRE || mode == TARGET_MODE_FIRE_BLIND ) {
+        aim_types = get_default_aim_type();
+    } else {
+        aim_types = p.get_aim_types( ranged_weapon );
+    }
+
     if( display_type != "numbers" ) {
         std::string symbols;
         for( const confidence_rating &cr : confidence_config ) {
@@ -894,6 +904,12 @@ static int print_ranged_chance( const player &p, const catacurses::window &w, in
         } else {
             moves_to_fire = p.gun_engagement_moves( ranged_weapon, threshold, recoil ) + time_to_fire( p,
                             *ranged_weapon.type );
+        }
+
+        if( mode == TARGET_MODE_FIRE || mode == TARGET_MODE_FIRE_BLIND ) {
+            moves_to_fire = aim_speed( p, ranged_weapon )
+        } else {
+            moves_to_fire = p.gun_engagement_moves( ranged_weapon, threshold, recoil ) + time_to_fire( p, * ranged_weapon.type );
         }
 
         auto hotkey = front_or( type.action.empty() ? "FIRE" : type.action, ' ' );
@@ -943,7 +959,7 @@ static int print_aim( const player &p, const catacurses::window &w, int line_num
     // Creature::projectile_attack() into shared methods.
     // Dodge doesn't affect gun attacks
 
-    dispersion_sources dispersion = p.get_weapon_dispersion( *weapon );
+    dispersion_sources dispersion = p.get_weapon_dispersion( *weapon, is_blind_fire );
     dispersion.add_range( p.recoil_vehicle() );
 
     const double min_dispersion = p.effective_dispersion( p.weapon.sight_dispersion() );
@@ -964,6 +980,7 @@ static int print_aim( const player &p, const catacurses::window &w, int line_num
 
     const double range = rl_dist( p.pos(), pos );
     line_number = print_steadiness( w, line_number, steadiness );
+    const target_mode TARGET_MODE_FIRE = is_blind_fire ? TARGET_MODE_FIRE_BLIND : TARGET_MODE_FIRE;
     return print_ranged_chance( p, w, line_number, TARGET_MODE_FIRE, ctxt, *weapon, dispersion,
                                 confidence_config,
                                 range, target_size, predicted_recoil );
@@ -1397,6 +1414,9 @@ std::vector<tripoint> target_handler::target_ui( player &pc, target_mode mode,
                 // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
                 line_number = draw_throw_aim( pc, w_target, line_number, ctxt, relevant, dst, false );
             } else if( mode == TARGET_MODE_THROW_BLIND ) {
+                // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
+                line_number = draw_throw_aim( pc, w_target, line_number, ctxt, relevant, dst, true );
+            } else if( mode == TARGET_MODE_FIRE_BLIND ) {
                 // NOLINTNEXTLINE(clang-analyzer-deadcode.DeadStores)
                 line_number = draw_throw_aim( pc, w_target, line_number, ctxt, relevant, dst, true );
             }
@@ -2254,12 +2274,15 @@ dispersion_sources player::get_weapon_dispersion( const item &obj, Creature *cri
         dispersion.add_range( 150 ); //Adding dispersion for additonal debuff
         dispersion.add_multiplier( 4 );
     }
+
     if( is_blind_fire ) {
         dispersion *= 4;
     }
 
     return dispersion;
 }
+
+dealt_projectile_attack player::fire_gun( const tripoint &target, const item &fire_gun, const cata::optional<tripoint> &blind_fire_from_pos )
 
 double player::gun_value( const item &weap, int ammo ) const
 {
