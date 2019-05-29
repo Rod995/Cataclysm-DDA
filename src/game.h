@@ -436,7 +436,7 @@ class game
          */
         bool plfire( item &weapon, int bp_cost = 0 );
         /** It handles firing. */
-        void plblindfire( const cata::optional<tripoint> &blind_fire_from_pos = cata::nullopt );
+        bool plblindfire( const cata::optional<tripoint> &blind_fire_from_pos = cata::nullopt );
         /** Redirects to player::cancel_activity(). */
         void cancel_activity();
         /** Asks if the player wants to cancel their activity, and if so cancels it. */

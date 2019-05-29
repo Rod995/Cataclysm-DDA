@@ -8000,7 +8000,7 @@ bool game::plfire( item &weapon, int bp_cost )
     return plfire();
 }
 
-void plblindfire( p ) {
+bool game::plblindfire( const cata::optional<tripoint> &p ) {
     gun_mode gun = weapon.gun_current_mode();
     if( !gun ) {
         add_msg( m_info, _( "The %s can't be fired in its current state." ), weapon.tname() );
