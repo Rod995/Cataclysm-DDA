@@ -5584,7 +5584,7 @@ void game::peek( const tripoint &p )
     }
 
     if( result.peek_action && *result.peek_action == PA_BLIND_FIRE ) {
-        plfire( INT_MIN, p );
+        plblindfire( p );
     }
 
     draw_ter();
@@ -7884,32 +7884,6 @@ bool game::plfire_check( const targeting_data &args )
         }
     }
 
-    // Shift our position to our "peeking" position, so that the UI
-    // for picking a fire point lets us target the location we couldn't
-    // otherwise see.
-    const tripoint original_player_position = u.pos();
-    if( blind_fire_from_pos ) {
-        u.setpos( *blind_fire_from_pos );
-        draw_ter();
-    }
-    temp_exit_fullscreen();
-    m.draw( w_terrain, u.pos() );
-
-    const target_mode target_mode = blind_fire_from_pos ? TARGET_MODE_FIRE_BLIND : TARGET_MODE_FIRE
-
-    // target_ui() sets x and y, or returns empty vector if we canceled (by pressing Esc)
-    std::vector<tripoint> trajectory = target_handler().target_ui( u, target_mode, &thrown, range );
-
-    // If we previously shifted our position, put ourselves back now that we've picked our target.
-    if( blind_fire_from_pos ) {
-        u.setpos( original_player_position );
-    }
-
-    if( thrown.count_by_charges() && thrown.charges > 1 ) {
-        u.i_at( -1 ).charges--;
-        thrown.charges = 1;
-    }
-
     return true;
 }
 
@@ -8023,6 +7997,38 @@ bool game::plfire( item &weapon, int bp_cost )
         firing_callback(), firing_callback()
     };
     u.set_targeting_data( args );
+    return plfire();
+}
+
+void plblindfire( p ) {
+    gun_mode gun = weapon.gun_current_mode();
+    if( !gun ) {
+        add_msg( m_info, _( "The %s can't be fired in its current state." ), weapon.tname() );
+        return false;
+    }
+
+    targeting_data args = {
+        TARGET_MODE_FIRE, &weapon, gun.target->gun_range( &u ),
+        bp_cost, &u.weapon == &weapon, gun->ammo_data(),
+        target_callback(), target_callback(),
+        firing_callback(), firing_callback()
+    };
+    u.set_targeting_data( args );
+    const tripoint original_player_position = u.pos();
+    if( blind_fire_from_pos ) {
+        u.setpos( *blind_fire_from_pos );
+        draw_ter();
+    }
+    temp_exit_fullscreen();
+    m.draw( w_terrain, u.pos() );
+
+    const target_mode target_mode = blind_fire_from_pos ? TARGET_MODE_FIRE_BLIND : TARGET_MODE_FIRE
+
+    std::vector<tripoint> trajectory = target_handler().target_ui( u, target_mode, &thrown, range );
+
+    if( blind_fire_from_pos ) {
+        u.setpos( original_player_position );
+    }
     return plfire();
 }
 
