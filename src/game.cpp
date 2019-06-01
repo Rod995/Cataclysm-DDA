@@ -5575,6 +5575,8 @@ void game::peek( const tripoint &p )
     tripoint prev = u.pos();
     u.setpos( p );
     tripoint center = p;
+    tripoint target = p;
+    const tripoint blind_fire_from_pos = p;
     const look_around_result result = look_around( catacurses::window(), center, center, false, false,
                                       true );
     u.setpos( prev );
@@ -5582,9 +5584,9 @@ void game::peek( const tripoint &p )
     if( result.peek_action && *result.peek_action == PA_BLIND_THROW ) {
         plthrow( INT_MIN, p );
     }
-
+    int bp_cost = 0;
     if( result.peek_action && *result.peek_action == PA_BLIND_FIRE ) {
-        plblindfire( p );
+        plblindfire( bp_cost, p );
     }
 
     draw_ter();
@@ -8000,7 +8002,8 @@ bool game::plfire( item &weapon, int bp_cost )
     return plfire();
 }
 
-bool game::plblindfire( const cata::optional<tripoint> &p ) {
+bool game::plblindfire( item &weapon, int bp_cost, const cata::optional<tripoint> &p ) {
+    const &blind_throw_from_pos
     gun_mode gun = weapon.gun_current_mode();
     if( !gun ) {
         add_msg( m_info, _( "The %s can't be fired in its current state." ), weapon.tname() );
