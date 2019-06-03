@@ -952,14 +952,15 @@ static int print_ranged_chance( const player &p, const catacurses::window &w, in
 
 static int print_aim( const player &p, const catacurses::window &w, int line_number,
                       input_context &ctxt, item *weapon,
-                      const double target_size, const tripoint &pos, double predicted_recoil )
+                      const double target_size, const tripoint &pos, double predicted_recoil,
+                      const is_blind_fire )
 {
     // This is absolute accuracy for the player.
     // TODO: push the calculations duplicated from Creature::deal_projectile_attack() and
     // Creature::projectile_attack() into shared methods.
     // Dodge doesn't affect gun attacks
 
-    dispersion_sources dispersion = p.get_weapon_dispersion( *weapon, is_blind_fire );
+    const dispersion_sources dispersion = p.get_weapon_dispersion( *weapon, is_blind_fire );
     dispersion.add_range( p.recoil_vehicle() );
 
     const double min_dispersion = p.effective_dispersion( p.weapon.sight_dispersion() );
@@ -2279,7 +2280,7 @@ dispersion_sources player::get_weapon_dispersion( const item &obj, Creature *cri
         dispersion *= 4;
     }
 
-    return dispersion;
+    return std::max( 0, dispersion );
 }
 
 dealt_projectile_attack player::fire_gun( const tripoint &target, const item &fire_gun, const cata::optional<tripoint> &blind_fire_from_pos )

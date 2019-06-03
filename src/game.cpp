@@ -5586,7 +5586,7 @@ void game::peek( const tripoint &p )
     }
     int bp_cost = 0;
     if( result.peek_action && *result.peek_action == PA_BLIND_FIRE ) {
-        plblindfire( bp_cost, p );
+        plblindfire( item weapon, bp_cost, p );
     }
 
     draw_ter();
